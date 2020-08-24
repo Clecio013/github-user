@@ -1,68 +1,68 @@
+const form = document.querySelector('form')
+const input = document.querySelector('input')
+const usersDom = document.querySelector('.users')
+const toastElement = document.querySelector('.toast')
 const users = []
 
-const getUser = () => {
-  const input = document.querySelector('input')
-  const usersDom = document.querySelector('.users')
-  const toastElement = document.querySelector('.toast')
+const showToast = message => {
+  const text = document.createTextNode(message)
+  toastElement.appendChild(text)
+  toastElement.classList.add('on')
+
+  const toastTimeout = () => setTimeout(() => {
+    toastElement.classList.remove('on')
+    toastElement.removeChild(text)
+  }, 2000)
+
+  toastTimeout()
+
+  clearTimeout(toastTimeout)
+}
+
+const userComponent = ({ avatar_url, name, followers, email }) => `
+  <img src='${avatar_url}' alt='Github avatar' />
+
+  <div>
+    <h1>${name}</h1>
+    <p>Seguidores: ${followers}</p>
+    <p>E-mail: ${email || 'Não possui'}</p>
+  </div>
+`
+
+form.addEventListener('submit', event => {
+  event.preventDefault()
+
+  if (toastElement.classList.contains('on')) {
+    return
+  }
 
   if (!input.value) {
-    const text = document.createTextNode('Digite um valor válido')
-    toastElement.appendChild(text)
-    toastElement.classList.add('on')
+    showToast('Digite um valor válido')
+    return
+  }
 
-    const showToast = () => setTimeout(() => {
-      toastElement.classList.remove('on')
-    }, 2000)
-    showToast()
+  const userExist = users.includes(input.value)
 
-    clearTimeout(showToast)
+  if (userExist) {
+    showToast('Esse usúario já foi cadastrado')
     return
   }
 
   fetch(`https://api.github.com/users/${input.value}`)
     .then(response => response.json())
-    .then(({ name, followers, email, avatar_url, html_url }) => {
-      if (users.includes(input.value)) {
-        const text = document.createTextNode('Esse usuário já foi adicionado')
-
-        toastElement.appendChild(text)
-        toastElement.classList.add('on')
-
-        const showToast = () => setTimeout(() => {
-          toastElement.classList.remove('on')
-        }, 2000)
-        showToast()
-
-        clearTimeout(showToast)
-        return
-      }
-
-      users.push(input.value)
+    .then(({ login, html_url, ...rest }) => {
+      users.push(login)
 
       const link = document.createElement('a')
       link.setAttribute('href', html_url)
 
-      const image = document.createElement('img')
-      image.setAttribute('src', avatar_url)
-
-      const content = document.createElement('div')
-
-      const githubName = document.createElement('h1')
-      githubName.textContent = name
-
-      const followerText = document.createElement('p')
-      followerText.textContent = `Seguidores: ${followers}`
-
-      const emailText = document.createElement('p')
-      emailText.textContent = `E-mail: ${email || 'Não possui'}`
-      
-      content.appendChild(githubName)
-      content.appendChild(followerText)
-      content.appendChild(emailText)
-
-      link.appendChild(image)
-      link.appendChild(content)
-
+      link.innerHTML = userComponent({ ...rest })
       usersDom.appendChild(link)
     })
-}
+    .catch((error) => {
+      showToast('Ocorreu um erro')
+      return
+    })
+
+  console.log(users)
+})
