@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <title>Usuários github</title>
+</head>
+<body>
+  <div class="search">
+    <input placeholder="Nome de usuário do github" type="text">
+    <button onclick="getUser()">Pesquisar</button>
+  </div>
+
+  <div class="users"></div>
+  <div class="toast"></div>
+
+  <script>
+    const users = []
+
+    const getUser = () => {
+      const input = document.querySelector('input')
+      const usersDom = document.querySelector('.users')
+      const toastElement = document.querySelector('.toast')
+
+      if (!input.value) {
+        const text = document.createTextNode('Digite um valor válido')
+        toastElement.appendChild(text)
+        toastElement.classList.add('on')
+
+        const showToast = () => setTimeout(() => {
+          toastElement.classList.remove('on')
+        }, 2000)
+        showToast()
+
+        clearTimeout(showToast)
+        return
+      }
+
+      fetch(`https://api.github.com/users/${input.value}`)
+        .then(response => response.json())
+        .then(({ name, followers, email, avatar_url, html_url }) => {
+          if (users.includes(input.value)) {
+            const text = document.createTextNode('Esse usuário já foi adicionado')
+
+            toastElement.appendChild(text)
+            toastElement.classList.add('on')
+
+            const showToast = () => setTimeout(() => {
+              toastElement.classList.remove('on')
+            }, 2000)
+            showToast()
+
+            clearTimeout(showToast)
+            return
+          }
+
+          users.push(input.value)
+
+          const title = document.createElement('h1')
+          const link = document.createElement('a')
+          link.setAttribute('href', html_url)
+
+          const image = document.createElement('img')
+          image.setAttribute('src', avatar_url)
+
+          const content = document.createElement('div')
+
+          const githubName = document.createElement('h1')
+          githubName.textContent = name
+
+          const followerText = document.createElement('p')
+          followerText.textContent = `Seguidores: ${followers}`
+
+          const emailText = document.createElement('p')
+          emailText.textContent = `E-mail: ${email}`
+          
+          content.appendChild(githubName)
+          content.appendChild(followerText)
+          content.appendChild(emailText)
+
+          link.appendChild(image)
+          link.appendChild(content)
+
+          usersDom.appendChild(link)
+        })
+    }
+  </script>
+</body>
+</html>
