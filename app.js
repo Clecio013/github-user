@@ -32,25 +32,32 @@ const userComponent = ({ avatar_url, name, followers, email }) => `
 form.addEventListener('submit', event => {
   event.preventDefault()
 
+  const inputValue = input.value
+
   if (toastElement.classList.contains('on')) {
     return
   }
 
-  if (!input.value) {
+  if (!inputValue) {
     showToast('Digite um valor válido')
     return
   }
 
-  const userExist = users.includes(input.value)
+  const userExist = users.includes(inputValue)
 
   if (userExist) {
     showToast('Esse usúario já foi cadastrado')
     return
   }
 
-  fetch(`https://api.github.com/users/${input.value}`)
+  fetch(`https://api.github.com/users/${inputValue}`)
     .then(response => response.json())
     .then(({ login, html_url, ...rest }) => {
+      if (!login) {
+        showToast('Usuário não encontrado')
+        return
+      }      
+
       users.push(login)
 
       const link = document.createElement('a')
@@ -59,10 +66,8 @@ form.addEventListener('submit', event => {
       link.innerHTML = userComponent({ ...rest })
       usersDom.appendChild(link)
     })
-    .catch((error) => {
+    .catch(() => {
       showToast('Ocorreu um erro')
       return
     })
-
-  console.log(users)
 })
