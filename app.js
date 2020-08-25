@@ -1,8 +1,12 @@
-const form = document.querySelector('form')
-const input = document.querySelector('input')
-const usersDom = document.querySelector('.users')
-const toastElement = document.querySelector('.toast')
+const $ = element => document.querySelector(element)
+
+const form = $('form')
+const input = $('input')
+const usersDom = $('.users')
+const toastElement = $('.toast')
 const users = []
+
+input.focus()
 
 const showToast = message => {
   const text = document.createTextNode(message)
