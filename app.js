@@ -8,7 +8,12 @@ const users = []
 
 input.focus()
 
-const showToast = message => {
+/**
+ * Toast component
+ * @param message Message that will be displayed inside toast
+ * @param displayTime Time that toast will be displayed
+*/
+const Toast = (message, displayTime = 2000) => {
   const text = document.createTextNode(message)
   toastElement.appendChild(text)
   toastElement.classList.add('on')
@@ -16,14 +21,22 @@ const showToast = message => {
   const toastTimeout = () => setTimeout(() => {
     toastElement.classList.remove('on')
     toastElement.removeChild(text)
-  }, 2000)
+  }, displayTime)
 
   toastTimeout()
 
   clearTimeout(toastTimeout)
 }
 
-const userComponent = ({ avatar_url, name, company, location, email }) => `
+/**
+ * User component with reusable with props
+ * @param avatar_url Avatar image link
+ * @param name User name
+ * @param company Company
+ * @param location User location
+ * @param email E-mail
+*/
+const UserUI = ({ avatar_url, name, company, location, email }) => `
   <img src='${avatar_url}' alt='Github avatar' />
 
   <div>
@@ -39,19 +52,21 @@ form.addEventListener('submit', event => {
 
   const inputValue = input.value
 
-  if (toastElement.classList.contains('on')) {
+  const toastActive = toastElement.classList.contains('on')
+
+  if (toastActive) {
     return
   }
 
   if (!inputValue) {
-    showToast('Digite um valor válido')
+    Toast('Digite um valor válido')
     return
   }
 
   const userExist = users.includes(inputValue)
 
   if (userExist) {
-    showToast('Esse usúario já foi cadastrado')
+    Toast('Esse usúario já foi cadastrado')
     return
   }
 
@@ -59,20 +74,20 @@ form.addEventListener('submit', event => {
     .then(response => response.json())
     .then(({ login, html_url, ...rest }) => {
       if (!login) {
-        showToast('Usuário não encontrado')
+        Toast('Usuário não encontrado')
         return
-      }      
+      }
 
       users.push(login)
 
       const link = document.createElement('a')
       link.setAttribute('href', html_url)
 
-      link.innerHTML = userComponent({ ...rest })
+      link.innerHTML = UserUI({ ...rest })
       usersDom.appendChild(link)
     })
     .catch(() => {
-      showToast('Ocorreu um erro')
+      Toast('Ocorreu um erro')
       return
     })
 })
