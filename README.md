@@ -9,6 +9,7 @@ Technologies I used to create this project
 * HTML
 * CSS
 * Javascript
+* Webpack
 
 I decided to use these technolgoies to learn how to create a project just with HTML, CSS and Javascript
 
