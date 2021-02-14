@@ -1,5 +1,5 @@
 ## 👨🏽‍💻 About the project
-This is a [project](https://githubjs.netlify.app/) created to search by a github profile and show in the screen.
+This is a [project](https://githubjs.clecioalmeida.com.br/) created to search by a github profile and show in the screen.
 
 ![Project image desktop and mobile](https://raw.githubusercontent.com/Clecio013/github-user/master/assets/mockup.png)
 
